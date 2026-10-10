@@ -1,0 +1,8 @@
+{
+  "name": "sindorim-faith-management-prototype",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {"start": "node server.mjs", "test": "node scripts/domain-test.mjs", "build": "node scripts/build-static.mjs"},
+  "description": "47-screen local prototype based on the 2026-10-09 planning document"
+}

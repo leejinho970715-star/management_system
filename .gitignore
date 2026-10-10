@@ -1,0 +1,6 @@
+tmp/
+output/qa/
+node_modules/
+*.log
+dist/
+output/*.zip

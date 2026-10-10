@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {seed} from '../app/store.js';
+import {screens} from '../app/catalog.js';
+import {maskName,weekRange,upsert,streak,scopeMembers,attendanceMetric,reportSnapshot,carryActions} from '../app/domain.js';
+let checks=0;const test=(name,fn)=>{fn();checks++;console.log('PASS '+name)};
+test('47 unique screen IDs',()=>{assert.equal(screens.length,47);assert.equal(new Set(screens.map(s=>s.id)).size,47)});
+test('ten districts in requested order',()=>{assert.deepEqual(seed().districts.map(d=>d.name),Array.from({length:10},(_,i)=>(i+1)+'구역'));assert.equal(seed().members.length,60)});
+test('2/3/4/5 character masking',()=>{assert.equal(maskName('김하','01012345678'),'김*(5678)');assert.equal(maskName('홍길동','01012345678'),'홍*동(5678)');assert.equal(maskName('남궁민수','5678'),'남**수(5678)');assert.equal(maskName('가나다라마','5678'),'가**라마(5678)')});
+test('Sunday to Saturday custom week',()=>{assert.deepEqual(weekRange(2026,41),{start:'2026-10-04',end:'2026-10-10'})});
+test('attendance upsert key includes service',()=>{const a=[];upsert(a,{memberId:'m1',week:41,service:'주일',status:'출석'},['memberId','week','service']);upsert(a,{memberId:'m1',week:41,service:'주일',status:'결석'},['memberId','week','service']);upsert(a,{memberId:'m1',week:41,service:'수요',status:'온라인'},['memberId','week','service']);assert.equal(a.length,2);assert.equal(a[0].status,'결석')});
+test('missing and excused break consecutive absence',()=>{const s=seed();assert.equal(streak(s.attendance,'m4',41,'주일'),12);assert.equal(streak(s.attendance,'m2',41,'주일'),0);s.attendance.find(a=>a.memberId==='m4'&&a.week===40).status='사유결석';assert.equal(streak(s.attendance,'m4',41,'주일'),1)});
+test('district role never includes other district',()=>{assert.equal(scopeMembers(seed(),'district','1구역').length,6);assert.ok(scopeMembers(seed(),'district','1구역').every(m=>m.district==='1구역'))});
+test('metrics track missing separately',()=>{const s=seed(),m=scopeMembers(s,'district','1구역');const r=attendanceMetric(s,m,41,'주일');assert.equal(r.total,6);assert.equal(r.missing,1);assert.equal(r.present,4)});
+test('snapshot survives source mutation',()=>{const s=seed(),m=scopeMembers(s,'district','1구역');const snap=structuredClone(reportSnapshot(s,m,41,'주일'));const before=snap.present;s.attendance.find(a=>a.memberId==='m1'&&a.week===41).status='결석';assert.equal(snap.present,before);assert.notEqual(reportSnapshot(s,m,41,'주일').present,before)});
+test('carry excludes completed, prevents duplicates, preserves original',()=>{const s=seed();assert.equal(carryActions(s,'mt2','2026-10-10'),1);assert.equal(carryActions(s,'mt2','2026-10-10'),0);assert.equal(s.actions.filter(a=>a.originId==='a1').length,1);assert.equal(s.actions.find(a=>a.id==='a1').status,'진행')});
+console.log(`${checks} domain checks passed`);

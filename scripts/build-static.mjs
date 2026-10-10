@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const dist=path.resolve(root,'dist');
+const base=new URL(process.argv[2]||'https://leejinho970715-star.github.io/management_system/');
+if(base.protocol!=='https:'&&base.protocol!=='http:')throw Error('Unsupported site URL');
+if(path.dirname(dist)!==root||path.basename(dist)!=='dist')throw Error('Unsafe build output path');
+fs.rmSync(dist,{recursive:true,force:true});
+fs.cpSync(path.join(root,'app'),dist,{recursive:true});
+const origin=base.href.replace(/\/$/,'');
+const html=fs.readFileSync(path.join(dist,'index.html'),'utf8').replaceAll('__SITE_ORIGIN__',origin);
+if(html.includes('__SITE_ORIGIN__'))throw Error('Site origin substitution incomplete');
+fs.writeFileSync(path.join(dist,'index.html'),html);
+fs.writeFileSync(path.join(dist,'.nojekyll'),'');
+console.log('Static site built at '+dist+' for '+base.href);
