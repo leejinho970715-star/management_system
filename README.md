@@ -92,6 +92,14 @@ npm run build
 
 GitHub Pages 역시 가상 데이터 프로토타입입니다. 데이터는 접속한 사용자의 브라우저에만 저장됩니다. 실제 회원 계정과 서버 DB는 아직 연결되지 않았습니다.
 
+## Vercel 배포
+
+배포 URL: [신도림 신앙관리 시스템](https://management-system-six-omega.vercel.app/)
+
+`vercel.json`에서 Framework Preset을 Other로 지정하고, `npm run build`로 생성한 `dist/`만 정적 배포합니다. `server.mjs`는 로컬 미리보기용입니다. GitHub에 연결된 Vercel 프로젝트는 `main`에 push하면 다시 배포됩니다. 프로젝트의 Root Directory는 저장소 루트로 설정합니다.
+
+빌드 스크립트는 Vercel의 기본 시스템 환경변수에서 프로젝트 도메인을 읽어 OG·Twitter 메타데이터에 반영합니다. 직접 지정하려면 `SITE_URL`을 사용합니다. GitHub Pages 빌드는 기존처럼 명령행으로 전달된 Pages 주소를 우선합니다.
+
 ## 관리자 화면
 
 [관리자 로그인](https://leejinho970715-star.github.io/management_system/?role=admin#AD-01)에서 검토 계정 `admin@example.test` / `demo1234`로 시작합니다. 이 정보는 가상 로그인 동작을 확인하기 위한 공개 데모 값입니다. 서버 인증 또는 비밀 계정 정보가 아닙니다.
