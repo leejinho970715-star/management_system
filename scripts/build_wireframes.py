@@ -19,7 +19,7 @@ c=canvas.Canvas(str(OUT),pagesize=(W,H),pageCompression=1)
 c.setTitle('신도림 신앙관리 시스템 - 기획 분석 및 47개 화면설계 와이어프레임')
 c.setAuthor('화면설계 시안 / 2026-10-10')
 page=0
-roles={'lead':'지역장 / 회장','district':'구역장','evangelist':'전도 사명자','visitor':'심방 사명자','educator':'교육 사명자','finance':'회계 사명자','tf':'시스템 TF'}
+roles={'lead':'지역장 / 회장','district':'구역장','evangelist':'전도 사명자','visitor':'심방 사명자','educator':'교육 사명자','finance':'회계 사명자','tf':'시스템 TF','admin':'관리자'}
 meta=json.loads((SHOTS/'metadata.json').read_text(encoding='utf-8-sig'))
 extras=json.loads((SHOTS/'extras.json').read_text(encoding='utf-8-sig'))
 groups=[('CM','공통'),('OR','조직관리'),('SY','시스템관리'),('MB','회원관리'),('EV','전도관리'),('AT','출결관리'),('VS','심방관리'),('ED','교육관리'),('FN','회계관리'),('WR','주간보고'),('MT','회의관리')]
@@ -73,7 +73,7 @@ paragraph(54,H-321,'회원 중심 통합 이력, 주차별 업무와 자동 집�
 box(54,140,330,170,'47개 정의 화면','11개 메뉴의 모든 화면 ID 유지\n각 화면의 입력 항목과 처리 규칙\n원문 근거 페이지와 설계 판단 연결')
 box(406,140,330,170,'14개 보완 시안','회원 카드 7개 상세 탭\n구역장 대시보드 및 설정 상세\n핵심 모바일 화면 5개')
 box(758,140,378,170,'실행 가능한 로컬 웹 시안','가상 데이터 입력과 저장\n현황 연계, 제출 스냅샷, 이월 처리\n운영용 인증·DB·배치는 별도 구축')
-txt(54,95,'읽는 법: 2~8쪽 분석 / 9~55쪽 전체 화면 / 56~64쪽 변형 / 65~69쪽 모바일 / 70~73쪽 디자인',11,color=MUTED)
+txt(54,95,'읽는 법: 2~8쪽 분석 / 9~55쪽 전체 화면 / 56~64쪽 변형 / 65~69쪽 모바일 / 70~73쪽 디자인 / 74~77쪽 관리자',11,color=MUTED)
 end()
 
 new('기획의 방향과 화면 설계의 대응','02 / 목적과 범위','원문 p.3~4, 17, 19 · 아래 내용은 기획 요구를 화면으로 해석한 설계안입니다.')
@@ -85,7 +85,7 @@ rows(48,H-165,W-96,['기획의 문제','설계 목적','화면의 대응','검�
  ['전도 단계별 이탈 지점 불명확','이동 이력 기반 가시성','EV-03, EV-06, EV-07','현재 재적과 기간 전환 건수, 분모 구분']
  ],[240,210,330,W-96-780])
 box(48,98,(W-114)/2,180,'유지한 설계 원칙','지역 > 구역 > 회원, 회원 ID 중심의 기록 연결\n일요일~토요일 주차를 업무 공통 축으로 사용\n한 번 입력한 데이터를 대시보드와 보고에 재사용\n모바일 접근과 마스킹 표기를 기본으로 적용')
-box(66+(W-114)/2,98,(W-114)/2,180,'이번 구현의 범위','화면과 업무 흐름 검토를 위한 프런트엔드 시안\n47개 화면, 가상 데이터, 브라우저 내 상태 저장\n실제 이메일 인증·DB 행 보안·회계 스키마는 미연결\n정식 서비스의 자동 배치·개인정보 파기는 수행하지 않음')
+box(66+(W-114)/2,98,(W-114)/2,180,'이번 구현의 범위','화면과 업무 흐름 검토를 위한 프런트엔드 시안\n기획서 47개 + 관리자 2개 / 가상 데이터 저장\n실제 이메일 인증·DB 행 보안·회계 스키마는 미연결\n정식 서비스의 자동 배치·개인정보 파기는 수행하지 않음')
 end()
 
 new('정보 구조와 화면 탐색','03 / 47개 화면 지도','원문 p.5, 8~15 · 공통·기반, 목양 업무, 운영·보고를 유지합니다.')
@@ -152,8 +152,8 @@ end()
 new('화면 코드와 단계적 도입의 연결','08 / 구현 및 검증','이 PDF의 화면은 실제 로컬 웹 구현을 흑백 와이어프레임 모드로 캡처한 것입니다.')
 box(48,450,530,215,'1단계 / 핵심 업무 검증','OR 조직·주차·계정 기준정보\nMB 회원 등록·카드·구역 이동\nAT-01~02 출석 입력과 현황\nWR-01~02 집계·제출·확인\n시범 2~3개 구역으로 운영 기준 확인')
 box(602,450,540,215,'2~3단계 / 업무 확장과 본 구축','전도, 심방·면담, 교육, 후속조치, 회의 추가\n회계 별도 스키마와 권한 도입\n서버 인증, RLS, 조회 이력, 배치, 보존·파기 정식화\n회원 ID 중심의 테이블과 집계 뷰 연결\n프런트 시안에서 확정한 항목을 API·DB에 매핑')
-box(48,177,530,245,'코드 구조와 실행','app/catalog.js: 47개 화면 및 근거·권한 메타데이터\napp/app.js: 화면, 폼, 업무 흐름 및 시안 제어\napp/domain.js: 마스킹·집계·중복 갱신·이월 규칙\napp/store.js: 가상 데이터 / app/export.js: Excel 출력\nserver.mjs: 로컬 정적 서버, npm start 또는 node server.mjs\n127.0.0.1:4173 / 검토용 서버는 4174로도 실행 가능')
-box(602,177,540,245,'검증과 실제 운영의 경계','47개 정의 화면 렌더와 주요 모바일 5개 화면 검사\n출석 저장·보고 스냅샷·확인·단계 이동·이월 검증\n동의 기반 회원 등록, 수정, 마스킹 Excel 파일 검증\n9개 도메인 테스트와 브라우저 업무 흐름 검증\n브라우저 저장은 시안용. 정식 계정·배치·DB는 미연결\n전체 화면은 세로 스크롤 / 넓은 모바일 표는 가로 스크롤')
+box(48,177,530,245,'코드 구조와 실행','app/catalog.js: 기획 47개 + 관리자 2개 화면 메타데이터\napp/app.js: 화면, 폼, 업무 흐름 및 시안 제어\napp/domain.js: 마스킹·집계·중복 갱신·이월 규칙\napp/store.js: 가상 데이터 / app/export.js: Excel 출력\nserver.mjs: 로컬 정적 서버, npm start 또는 node server.mjs\n127.0.0.1:4173 / 검토용 서버는 4174로도 실행 가능')
+box(602,177,540,245,'검증과 실제 운영의 경계','47개 정의 화면 렌더와 주요 모바일 5개 화면 검사\n출석 저장·보고 스냅샷·확인·단계 이동·이월 검증\n동의 기반 회원 등록, 수정, 마스킹 Excel 파일 검증\n10개 도메인 테스트와 관리자·업무 흐름 검증\n브라우저 저장은 시안용. 정식 계정·배치·DB는 미연결\n전체 화면은 세로 스크롤 / 넓은 모바일 표는 가로 스크롤')
 paragraph(48,107,'이후 화면별 페이지: 왼쪽은 실제 동작하는 와이어프레임, 오른쪽은 목적·역할·입력·처리 규칙·검토 사항입니다. 화면 밖 하단 내용은 웹에서 스크롤로 이어집니다.',W-96,11,20)
 end()
 
@@ -171,7 +171,7 @@ def screenshot_page(s,file=None,title=None,note=None,mobile=False):
   c.setStrokeColor(LINE);c.rect(x-1,y-1,w+2,h+2,fill=0,stroke=1)
   c.drawImage(str(imgpath),x,y,width=w,height=h,mask='auto');rx=915;rw=W-rx-48
  ry=H-184
- entries=[('01 / 화면 목적',s.get('description',note or '회원 기록의 상세 구성 확인')),('02 / 시안 역할',roles[s.get('role','lead')]),('03 / 핵심 정보',s.get('fields',note or '탭 또는 하위 영역의 기록과 처리 상태')),('04 / 처리 규칙',s.get('rule',note or '기록을 회원 ID에 연결하고 범위별로 표시합니다.')),('05 / 원문 근거',f"기획서 p.{s.get('source',9)} / {id}")]
+ entries=[('01 / 화면 목적',s.get('description',note or '회원 기록의 상세 구성 확인')),('02 / 시안 역할',roles[s.get('role','lead')]),('03 / 핵심 정보',s.get('fields',note or '탭 또는 하위 영역의 기록과 처리 상태')),('04 / 처리 규칙',s.get('rule',note or '기록을 회원 ID에 연결하고 범위별로 표시합니다.')),('05 / 원문 근거',f"기획서 p.{s.get('source',9)} / {id}" if s.get('source') else f"추가 사용자 요청 / {id}")]
  if note:entries.append(('06 / 검토 메모',note))
  elif s.get('type') in ['ownFinance','permissions','privacy','relationships','appointments','evStats']:entries.append(('06 / 검토 메모','미확정 또는 상충 항목은 분석 6~7쪽 참고. 시안에서 정책 승인을 대신하지 않습니다.'))
  else:entries.append(('06 / 화면 동작','저장과 조회는 가상 데이터 기준. 실제 운영에는 서버 인증·권한 검증과 DB 연동이 필요합니다.'))
@@ -181,26 +181,27 @@ def screenshot_page(s,file=None,title=None,note=None,mobile=False):
  txt(48,65,'첫 화면 viewport 시안 / 하단 목록과 입력은 웹에서 스크롤로 계속 / 표시 수치는 가상 값',8,color=MUTED)
  end()
 
-for s in meta:screenshot_page(s)
+for s in meta:
+ if s['group']!='AD':screenshot_page(s)
 for s in extras:
  base=next(m for m in meta if m['id']==s['id']).copy();base.update(s)
  screenshot_page(base,file=s['file'],title=s['title'],note=s['note'])
 for id,r,title in [('CM-02','district','구역장 대시보드'),('MB-03','lead','회원 카드'),('AT-01','district','주간 출석 입력'),('WR-01','district','주간보고 작성'),('CM-01','district','로그인')]:
  s=next(m for m in meta if m['id']==id).copy();s['role']=r
  screenshot_page(s,file=id+'-mobile',title=title+' / 모바일',mobile=True)
-new('Teal, Pretendard, 그리고 가벼운 블록 효과','DESIGN / 사용자 지정 가이드','추가 요청 반영: #0D9488 · Pretendard · 1~10구역 · 은은한 그림자와 두께감')
+new('Teal, Pretendard, 그리고 가벼운 블록 효과','DESIGN / 사용자 지정 가이드','추가 요청 반영: #0D9488 · Pretendard · 1~10구역 · 그림자 없이 테두리로 표현한 두께감')
 swatches=[('#0D9488','주 색상 / 지표와 강조'),('#0f766e','상호작용 / 높은 대비'),('#103e3b','탐색 영역 / 깊은 청록'),('#e6f7f3','보조 배경 / 밝은 민트'),('#f3f8f6','화면 배경 / 부드러운 바탕')]
 for i,(col,label_) in enumerate(swatches):
  x=48+i*221;c.setFillColor(HexColor(col));c.roundRect(x,490,201,165,12,fill=1,stroke=0);txt(x,464,col,16,True);txt(x,441,label_,11,color=MUTED)
 box(48,133,345,245,'Pretendard / 가독성과 일관성','웹과 PDF에 Pretendard 적용\n제목 23~27px / 큰 지표 30~32px\n본문과 입력 12~14px / 보조 10~11px\n굵기 400 / 600 / 700~750\n공식 글꼴 파일 로컬 포함, 외부 CDN 의존 제거')
-box(414,133,345,245,'가벼운 3D 플랫 블록','카드 아래 3~5px 단단한 그림자\n보조 확산 그림자로 살짝 뜬 느낌\n버튼은 눌릴 때 2px 이동\n아이콘은 작은 민트 블록으로 배치\n둥근 모서리 8~13px / 과한 입체 장식 최소화')
+box(414,133,345,245,'가벼운 3D 플랫 블록','카드 아래 3px / 오른쪽 2px 테두리\n면과 테두리의 색 차이로 블록 질감\n호버·선택 배경의 텍스트와 아이콘 흰색\n버튼은 눌릴 때 1px 이동 / 그림자 없음\n모바일 메뉴 닫기·배경 클릭·Escape 지원')
 box(780,133,362,245,'구역 항목과 화면 적용','1구역부터 10구역까지 기본 생성\n구역장 역할의 담당 구역 선택\n지역장의 전체 또는 개별 구역 필터\n구역별 지표를 2열로 비교\n보고 제출 현황은 10개 구역 기준')
 txt(48,91,'글꼴 출처: github.com/orioncactus/pretendard / SIL Open Font License / 라이선스 파일 코드에 포함',10,color=MUTED)
 end()
 import shutil
 for source,target in [('desktop-dashboard.png','color-desktop.png'),('mobile-dashboard.png','color-mobile.png')]:shutil.copyfile(ROOT/'output/qa'/source,SHOTS/target)
 cs=next(m for m in meta if m['id']=='CM-02').copy()
-screenshot_page(cs,file='color-desktop',title='지역장 대시보드 / 컬러 디자인',note='사용자 지정 #0D9488 기반 청록, Pretendard, 10개 구역, 블록 그림자를 반영한 실행 화면입니다.')
+screenshot_page(cs,file='color-desktop',title='지역장 대시보드 / 컬러 디자인',note='사용자 지정 #0D9488 기반 청록, Pretendard, 10개 구역, 그림자 없는 블록 테두리를 반영한 실행 화면입니다.')
 cs['role']='district'
 screenshot_page(cs,file='color-mobile',title='구역장 대시보드 / 컬러 모바일',note='색상, 서체와 블록 두께감을 모바일에서도 유지합니다. 담당 구역 필터는 1~10구역입니다.',mobile=True)
 new('페이지 로고, favicon, Open Graph 이미지','DESIGN / 브랜드 자산','사용자 제공 이미지를 로고와 favicon의 원본으로 사용하고, 동일 로고를 활용한 공유 이미지를 제작했습니다.')
@@ -212,5 +213,11 @@ txt(910,463,'페이지 로고 / 제공 원본',12,True)
 paragraph(910,423,'favicon: ICO 16/32/48/64px\nPNG 32px / 터치 아이콘 180px\nOG: 제목·설명·이미지·크기·alt\nTwitter: summary_large_image\n배포 시 실제 도메인 URL 적용',230,11,22)
 paragraph(48,91,'로고: app/assets/logo.jpg / favicon: app/assets/favicon.ico / 공유 이미지: app/assets/og-image.png. 로컬 미리보기 주소로는 외부 서비스의 공유 크롤러가 접속할 수 없습니다.',W-96,10,18)
 end()
+for id in ['AD-01','AD-02']:
+ s=next(m for m in meta if m['id']==id).copy()
+ screenshot_page(s,note='추가 관리자 역할. 계정·조직·시스템 운영 범위로 구성하고 실제 서버 인증은 미연결입니다.')
+for id in ['AD-01','AD-02']:
+ s=next(m for m in meta if m['id']==id).copy()
+ screenshot_page(s,file=id+'-mobile',title=s['title']+' / 모바일',mobile=True,note='모바일 메뉴는 닫기 버튼·배경 클릭·Escape를 지원합니다. 입력과 계정 관리 흐름은 데스크톱과 같습니다.')
 c.save()
 print(json.dumps({'pdf':str(OUT),'pages':page,'screens':len(meta),'variants':len(extras),'mobile':5},ensure_ascii=False))

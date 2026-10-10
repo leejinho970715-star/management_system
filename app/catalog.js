@@ -1,5 +1,5 @@
-export const roles={lead:'지역장 / 회장',district:'구역장',evangelist:'전도 사명자',visitor:'심방 사명자',educator:'교육 사명자',finance:'회계 사명자',tf:'시스템 TF'};
-export const groups=[['CM','나의 업무','home'],['MB','회원관리','users'],['EV','전도관리','sprout'],['AT','출결관리','check'],['VS','심방관리','heart'],['ED','교육관리','book'],['FN','회계관리','wallet'],['WR','주간보고','file'],['MT','회의관리','message'],['OR','조직관리','network'],['SY','시스템관리','shield']];
+export const roles={lead:'지역장 / 회장',district:'구역장',evangelist:'전도 사명자',visitor:'심방 사명자',educator:'교육 사명자',finance:'회계 사명자',tf:'시스템 TF',admin:'관리자'};
+export const groups=[['AD','관리자 콘솔','shield'],['CM','나의 업무','home'],['MB','회원관리','users'],['EV','전도관리','sprout'],['AT','출결관리','check'],['VS','심방관리','heart'],['ED','교육관리','book'],['FN','회계관리','wallet'],['WR','주간보고','file'],['MT','회의관리','message'],['OR','조직관리','network'],['SY','시스템관리','shield']];
 // Roles are deliberately conservative where the source contradicts itself.
 const all=Object.keys(roles),ld=['lead','district'],lv=['lead','district','visitor'];
 const defs=[
@@ -51,5 +51,10 @@ const defs=[
 ['MT-02','액션 아이템 관리','결정사항의 담당자와 완료 기한을 추적합니다.','actions',['lead','district','evangelist','visitor','educator','finance'],15,'회의 · 결정사항 · 담당자 · 기한 · 진행/완료/취소','담당자 또는 지역장이 처리. 완료일 자동 기록.'],
 ['MT-03','미결 이월 처리','기한이 지난 미완료 결정을 다음 회의로 연결합니다.','carry',['lead'],15,'기한 경과 항목 · 원본 회의 · 다음 회의 · 이월','동일 원본/대상회의 중복 이월 방지. 원본 상태 유지.']
 ];
-export const screens=defs.map(([id,title,description,type,allow,source,fields,rule])=>({id,title,description,type,allow,source,fields,rule,group:id.slice(0,2)}));
+for(const d of defs)if(['OR','SY'].includes(d[0].slice(0,2))&&!d[4].includes('admin'))d[4].push('admin');
+const extensions=[
+['AD-01','관리자 로그인','관리자 계정으로 운영 워크스페이스에 접속합니다.','adminLogin',all,0,'이메일 · 비밀번호 · 접속 정보 기억 · 비밀번호 표시','추가 사용자 요청. 데모 로그인으로 관리자 화면 연결. 실제 인증 미연결.'],
+['AD-02','관리자 대시보드','계정과 권한, 구역 운영과 변경 이력을 관리합니다.','adminDashboard',['admin'],0,'활동 계정 · 운영 구역 · 회수 대기 · 이력 · 빠른 관리 메뉴','추가 사용자 요청. 시스템 운영 범위만 허용하며 회계 및 민감 업무 기록 권한은 부여하지 않음.']
+];
+export const screens=[...defs,...extensions].map(([id,title,description,type,allow,source,fields,rule])=>({id,title,description,type,allow,source,fields,rule,group:id.slice(0,2)}));
 export const byId=Object.fromEntries(screens.map(s=>[s.id,s]));

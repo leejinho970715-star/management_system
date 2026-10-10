@@ -3,7 +3,7 @@ import {seed} from '../app/store.js';
 import {screens} from '../app/catalog.js';
 import {maskName,weekRange,upsert,streak,scopeMembers,attendanceMetric,reportSnapshot,carryActions} from '../app/domain.js';
 let checks=0;const test=(name,fn)=>{fn();checks++;console.log('PASS '+name)};
-test('47 unique screen IDs',()=>{assert.equal(screens.length,47);assert.equal(new Set(screens.map(s=>s.id)).size,47)});
+test('47 planned screens plus two admin screens',()=>{assert.equal(screens.filter(s=>s.group!=='AD').length,47);assert.equal(screens.length,49);assert.equal(new Set(screens.map(s=>s.id)).size,49)});
 test('ten districts in requested order',()=>{assert.deepEqual(seed().districts.map(d=>d.name),Array.from({length:10},(_,i)=>(i+1)+'구역'));assert.equal(seed().members.length,60)});
 test('2/3/4/5 character masking',()=>{assert.equal(maskName('김하','01012345678'),'김*(5678)');assert.equal(maskName('홍길동','01012345678'),'홍*동(5678)');assert.equal(maskName('남궁민수','5678'),'남**수(5678)');assert.equal(maskName('가나다라마','5678'),'가**라마(5678)')});
 test('Sunday to Saturday custom week',()=>{assert.deepEqual(weekRange(2026,41),{start:'2026-10-04',end:'2026-10-10'})});
