@@ -133,3 +133,21 @@ table{font-size:16px}th,td{padding:14px 16px;font-size:16px}
  .checkline{gap:12px 16px}.checkline label{min-height:32px}.chart{gap:8px}.chart-col small{font-size:16px}
  dialog{padding:20px;width:calc(100vw - 32px)}#toast{left:16px;right:16px;bottom:16px;font-size:16px;overflow-wrap:anywhere}
 }
+
+.profile-avatar-button{display:inline-grid;place-items:center;width:40px;height:40px;flex:0 0 40px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--forest)}
+.profile-avatar{width:40px;height:40px;flex:0 0 40px;overflow:hidden}
+.topbar .profile-avatar{display:inline-grid}
+.profile-avatar img{display:block;width:100%;height:100%;object-fit:cover}
+.profile-avatar.large{width:88px;height:88px;flex-basis:88px;font-size:28px}
+.profile-avatar-button:is(:hover,:active){background:var(--interaction-bg);color:white}
+.profile-avatar-button:is(:hover,:active) .profile-avatar{background:transparent;color:inherit}
+.profile-role{min-width:0;overflow-wrap:anywhere}
+.profile-photo-summary{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.profile-photo-summary>div{min-width:0;flex:1 1 180px}
+.profile-photo-summary p{margin:8px 0 16px}
+.profile-photo-editor{text-align:center;min-width:0}
+.profile-photo-editor p{overflow-wrap:anywhere}
+.photo-file-label{position:relative;overflow:hidden;cursor:pointer}
+.photo-file-label input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.photo-file-label:focus-within{outline:2px solid var(--interaction-bg);outline-offset:4px}
+.photo-file-label:hover{background:var(--interaction-bg);color:white;border-color:var(--interaction-bg)}

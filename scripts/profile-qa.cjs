@@ -1,0 +1,62 @@
+const fs=require('node:fs');
+const {chromium}=require('C:/Users/tlscj/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+(async()=>{
+ const base=(process.argv[2]||'http://127.0.0.1:4174').replace(/\/$/,'');
+ const browser=await chromium.launch({headless:true,executablePath:'C:/Users/tlscj/AppData/Local/ms-playwright/chromium-1234/chrome-win64/chrome.exe'});
+ const page=await browser.newPage({viewport:{width:1440,height:1080}});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));const checks=[];
+ const check=(ok,name)=>{if(!ok)throw Error(name);checks.push(name)};
+ try{
+  const response=await page.goto(base+'/?role=admin#AD-02');await page.waitForFunction(()=>window.prototype);
+  check(response.status()===200,'site responds 200');
+  check((await page.locator('.sidebar-foot .profile-role').innerText()).trim()==='관리자'&&await page.locator('.sidebar-foot .person small').count()===0,'sidebar profile shows role only');
+  check(await page.locator('.brand small').count()===0,'logo subtitle remains removed');
+  await page.locator('.sidebar-foot [data-action="profile-photo"]').click();
+  const upload=page.locator('#profile-photo-input');
+  await upload.setInputFiles({name:'bad.svg',mimeType:'image/svg+xml',buffer:Buffer.from('<svg/>')});
+  await page.waitForFunction(()=>document.querySelector('#profile-photo-status').textContent.includes('JPG, PNG, WEBP'));
+  check(await page.locator('#profile-photo-preview img').count()===0,'unsupported upload rejected');
+  await upload.setInputFiles({name:'large.png',mimeType:'image/png',buffer:Buffer.alloc(5*1024*1024+1)});
+  await page.waitForFunction(()=>document.querySelector('#profile-photo-status').textContent.includes('5MB 이하'));
+  check(await page.locator('#profile-photo-preview img').count()===0,'oversized upload rejected');
+  await upload.setInputFiles('app/assets/logo.jpg');
+  await page.waitForFunction(()=>document.querySelector('#profile-photo-preview img')?.naturalWidth===256);
+  check(await page.locator('.sidebar-foot .profile-avatar img').count()===0,'preview does not change saved profile');
+  await page.locator('#modal [data-action="close"]').click();
+  check(await page.locator('.sidebar-foot .profile-avatar img').count()===0,'cancel keeps original profile');
+  await page.locator('.topbar [data-action="profile-photo"]').click();
+  await upload.setInputFiles('app/assets/logo.jpg');
+  await page.waitForFunction(()=>document.querySelector('#profile-photo-preview img')?.naturalWidth===256);
+  await page.locator('[data-action="profile-photo-save"]').click();
+  await page.waitForFunction(()=>[...document.querySelectorAll('.app-shell .profile-avatar img')].filter(i=>i.naturalWidth===256).length===2);
+  check(await page.locator('.app-shell .profile-avatar img').count()===2,'saved photo shown in sidebar and header');
+  await page.reload();await page.waitForFunction(()=>document.querySelector('.sidebar-foot .profile-avatar img')?.naturalWidth===256);
+  check(true,'photo survives reload');
+  await page.evaluate(()=>window.prototype.navigate('CM-03','admin'));
+  check(await page.locator('.profile-photo-summary img').count()===1,'photo can be managed from My Info');
+  await page.evaluate(()=>window.prototype.navigate('CM-02','district'));
+  check(await page.locator('.sidebar-foot .profile-avatar img').count()===0,'other role profile stays separate');
+  check((await page.locator('.sidebar-foot .profile-role').innerText()).trim()==='구역장','district profile shows role only');
+  await page.evaluate(()=>window.prototype.navigate('AD-02','admin'));
+  for(const width of [320,390]){
+   await page.setViewportSize({width,height:844});
+   await page.locator('[data-action="menu"]').click();
+   await page.locator('.sidebar-foot [data-action="profile-photo"]').click();
+   await page.waitForFunction(()=>document.querySelector('.sidebar').getBoundingClientRect().right<=1);
+   check(!await page.locator('.sidebar').evaluate(el=>el.classList.contains('open')),'mobile drawer closes before photo dialog '+width);
+   check(await page.locator('.topbar .profile-avatar').isVisible(),'mobile header profile remains visible '+width);
+   check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&[...document.querySelector('#modal').querySelectorAll('*')].every(el=>{const r=el.getBoundingClientRect();return !r.width||(r.left>=0&&r.right<=innerWidth+1)})),'photo dialog fits mobile '+width);
+   await page.screenshot({path:'output/qa/profile-mobile-'+width+'.png'});
+   await page.keyboard.press('Escape');
+   check(!await page.locator('#modal').evaluate(el=>el.open),'Escape closes photo dialog '+width);
+  }
+  await page.locator('.topbar [data-action="profile-photo"]').click();
+  await page.locator('[data-action="profile-photo-remove"]').click();
+  check(await page.locator('#profile-photo-preview img').count()===0,'delete shows default preview');
+  await page.locator('[data-action="profile-photo-save"]').click();await page.reload();await page.waitForFunction(()=>window.prototype);
+  check(await page.locator('.profile-avatar img').count()===0,'photo deletion survives reload');
+  check(errors.length===0,'no browser errors');
+  fs.mkdirSync('output/qa',{recursive:true});fs.writeFileSync('output/qa/profile-verification.json',JSON.stringify({base,checks,errors},null,2));
+  console.log('PASS '+checks.length+' profile checks on '+base);
+ }finally{await browser.close()}
+})().catch(err=>{console.error(err);process.exit(1)});
