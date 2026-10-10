@@ -48,7 +48,7 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--interaction-bg)}
 .btn:active:not(:disabled){transform:translateY(1px)}
 .stat.accent{background:#0f766e;border-right-color:#09645d;border-bottom-color:#07574f}
 .task .task-icon,.funnel-box,.kanban-col,.prospect-card,.report-summary>div{border-style:solid;border-width:1px 2px 3px 1px;border-color:#d6e8df var(--block-side) var(--block-edge) #d6e8df}
-.brand-mark{border:1px solid #3d7662;border-right-width:2px;border-bottom:3px solid #062f25}
+.brand-mark,.login-brand img{border:0}
 .sidebar{border-right:3px solid #082d29}
 .topbar{border-bottom:2px solid #dce9e3}
 .nav-item.active{border-right:2px solid #0a6b63;border-bottom:3px solid #06594f;padding-bottom:7px}
