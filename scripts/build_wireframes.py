@@ -189,21 +189,21 @@ for s in extras:
 for id,r,title in [('CM-02','district','구역장 대시보드'),('MB-03','lead','회원 카드'),('AT-01','district','주간 출석 입력'),('WR-01','district','주간보고 작성'),('CM-01','district','로그인')]:
  s=next(m for m in meta if m['id']==id).copy();s['role']=r
  screenshot_page(s,file=id+'-mobile',title=title+' / 모바일',mobile=True)
-new('Teal, Pretendard, 그리고 가벼운 블록 효과','DESIGN / 사용자 지정 가이드','추가 요청 반영: #0D9488 · Pretendard · 1~10구역 · 그림자 없이 테두리로 표현한 두께감')
+new('Teal, Pretendard, 그리고 평면 디자인','DESIGN / 사용자 지정 가이드','추가 요청 반영: #0D9488 · Pretendard · 1~10구역 · 그림자·입체 효과 없는 평면 스타일')
 swatches=[('#0D9488','주 색상 / 지표와 강조'),('#0f766e','상호작용 / 높은 대비'),('#103e3b','탐색 영역 / 깊은 청록'),('#e6f7f3','보조 배경 / 밝은 민트'),('#f3f8f6','화면 배경 / 부드러운 바탕')]
 for i,(col,label_) in enumerate(swatches):
  x=48+i*221;c.setFillColor(HexColor(col));c.roundRect(x,490,201,165,12,fill=1,stroke=0);txt(x,464,col,16,True);txt(x,441,label_,11,color=MUTED)
-box(48,133,345,245,'Pretendard / 가독성과 일관성','웹과 PDF에 Pretendard 적용\n제목 23~27px / 큰 지표 30~32px\n본문과 입력 12~14px / 보조 10~11px\n굵기 400 / 600 / 700~750\n공식 글꼴 파일 로컬 포함, 외부 CDN 의존 제거')
-box(414,133,345,245,'가벼운 3D 플랫 블록','카드 아래 3px / 오른쪽 2px 테두리\n면과 테두리의 색 차이로 블록 질감\n호버·선택 배경의 텍스트와 아이콘 흰색\n버튼은 눌릴 때 1px 이동 / 그림자 없음\n모바일 메뉴 닫기·배경 클릭·Escape 지원')
+box(48,133,345,245,'Pretendard / 가독성과 일관성','웹과 PDF에 Pretendard 적용\n제목 24~27px / 큰 지표 30~32px\n웹 본문·입력·버튼·표는 최소 16px\n굵기 400 / 600 / 700~750\n공식 글꼴 파일 로컬 포함, 외부 CDN 의존 제거')
+box(414,133,345,245,'일관된 평면 컴포넌트','카드·버튼은 균일한 1px 테두리\n그림자·입체 테두리·버튼 이동 제거\n호버·선택 배경의 텍스트와 아이콘 흰색\n탭의 네 모서리 반경은 모두 8px\n로고 테두리 없음 / 모바일 메뉴 닫기 지원')
 box(780,133,362,245,'구역 항목과 화면 적용','1구역부터 10구역까지 기본 생성\n구역장 역할의 담당 구역 선택\n지역장의 전체 또는 개별 구역 필터\n구역별 지표를 2열로 비교\n보고 제출 현황은 10개 구역 기준')
 txt(48,91,'글꼴 출처: github.com/orioncactus/pretendard / SIL Open Font License / 라이선스 파일 코드에 포함',10,color=MUTED)
 end()
 import shutil
 for source,target in [('desktop-dashboard.png','color-desktop.png'),('mobile-dashboard.png','color-mobile.png')]:shutil.copyfile(ROOT/'output/qa'/source,SHOTS/target)
 cs=next(m for m in meta if m['id']=='CM-02').copy()
-screenshot_page(cs,file='color-desktop',title='지역장 대시보드 / 컬러 디자인',note='사용자 지정 #0D9488 기반 청록, Pretendard, 10개 구역, 그림자 없는 블록 테두리를 반영한 실행 화면입니다.')
+screenshot_page(cs,file='color-desktop',title='지역장 대시보드 / 컬러 디자인',note='사용자 지정 #0D9488 기반 청록, Pretendard, 10개 구역, 그림자·입체 효과 없는 평면 스타일을 반영한 실행 화면입니다.')
 cs['role']='district'
-screenshot_page(cs,file='color-mobile',title='구역장 대시보드 / 컬러 모바일',note='색상, 서체와 블록 두께감을 모바일에서도 유지합니다. 담당 구역 필터는 1~10구역입니다.',mobile=True)
+screenshot_page(cs,file='color-mobile',title='구역장 대시보드 / 컬러 모바일',note='최소 16px 본문, 체크박스 가로 정렬과 평면 스타일을 모바일에서도 유지합니다. 담당 구역 필터는 1~10구역입니다.',mobile=True)
 new('페이지 로고, favicon, Open Graph 이미지','DESIGN / 브랜드 자산','사용자 제공 이미지를 로고와 favicon의 원본으로 사용하고, 동일 로고를 활용한 공유 이미지를 제작했습니다.')
 c.drawImage(str(ROOT/'app/assets/og-image.png'),48,235,width=810,height=810*630/1200,mask='auto')
 txt(48,207,'공유용 og:image / 1200 x 630 PNG',12,True)

@@ -8,6 +8,9 @@ const {chromium}=require('C:/Users/tlscj/.cache/codex-runtimes/codex-primary-run
  const check=(ok,name)=>{if(!ok)throw Error(name);checks.push(name)};
  const white=async locator=>{await page.waitForFunction(el=>getComputedStyle(el).color==='rgb(255, 255, 255)',await locator.elementHandle(),{timeout:3000});return true};
  await page.goto(base+'/?role=lead#MB-01');await page.waitForFunction(()=>window.prototype);
+ check(await page.evaluate(()=>getComputedStyle(document.body).fontSize==='16px'),'body text is at least 16px');
+ check(await page.locator('.brand strong').innerText()==='일심도림','logo label uses Ilsimdorim');
+ check((await page.locator('.region-label').innerText()).includes('신도림지역'),'region name remains Sindorim');
  check(await white(page.locator('.nav-item.active')),'selected menu uses white text');
  check(await white(page.locator('.nav-item.active svg')),'selected menu uses white icon');
  const nav=page.locator('.nav-item:not(.active)').first();await nav.hover();check(await white(nav),'hovered menu uses white text');check(await white(nav.locator('svg')),'hovered menu uses white icon');
@@ -15,9 +18,12 @@ const {chromium}=require('C:/Users/tlscj/.cache/codex-runtimes/codex-primary-run
  const targetTab=await tab.getAttribute('href');await tab.click();await page.waitForFunction(href=>document.querySelector('.subtabs a.active')?.getAttribute('href')===href,targetTab);check(await white(page.locator('.subtabs a.active')),'clicked tab uses white text');
  await page.goto(base+'/?role=lead#MB-01');await page.waitForFunction(()=>window.prototype);
  const button=page.locator('.btn:not(.primary)').first();await button.hover();check(await white(button),'hovered button uses white text');
+ check(await page.locator('.subtabs a').evaluateAll(els=>els.every(el=>['borderTopLeftRadius','borderTopRightRadius','borderBottomRightRadius','borderBottomLeftRadius'].every(k=>getComputedStyle(el)[k]==='8px'))),'all tabs use the same 8px radius');
+ check(await page.locator('.brand-mark').evaluate(el=>getComputedStyle(el).borderTopWidth==='0px'),'logo has no border');
+ check(await button.evaluate(el=>getComputedStyle(el).transform==='none'),'button hover has no raised displacement');
  const ib=page.locator('[data-action="help"]');await ib.hover();check(await white(ib.locator('svg')),'hovered icon button uses white icon');
  check(await page.evaluate(()=>[...document.querySelectorAll('*')].every(el=>getComputedStyle(el).boxShadow==='none')),'all drop shadows removed');
- check(await page.locator('.panel').first().evaluate(el=>parseFloat(getComputedStyle(el).borderBottomWidth)===3),'block thickness comes from component border');
+ check(await page.locator('.panel').first().evaluate(el=>['borderTopWidth','borderRightWidth','borderBottomWidth','borderLeftWidth'].every(k=>getComputedStyle(el)[k]==='1px')),'flat component uses a uniform outline');
  await page.goto(base+'/?role=district#AT-01');await page.waitForFunction(()=>window.prototype);
  const attendance=page.locator('.segmented input[value="출석"]').first();await attendance.locator('..').click();check(await white(attendance.locator('+ span')),'selected attendance uses white text');
  await page.setViewportSize({width:390,height:844});
