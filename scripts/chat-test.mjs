@@ -53,7 +53,8 @@ try{
  result=await search('finance');check(result.total===1&&result.amount===25000,'finance query calculates exact monthly sum');
  await rejected(()=>search('visits'),'finance cannot query counseling');
  await actor('admin');check((await search('accounts')).total===6,'admin reads account summary');
- check((await search('organization')).total===10,'organization defaults retain districts 1 to 10');
+ result=await search('organization');check(result.total===10,'organization defaults retain districts 1 to 10');
+ check(result.items.map(x=>x.title).join(',')===Array.from({length:10},(_,i)=>(i+1)+'구역').join(','),'district results use natural 1 to 10 order');
  await rejected(()=>search('finance'),'system admin cannot access finance');
  await rejected(()=>search('members'),'system admin has no member search menu');
  await rejected(()=>search('arbitrary_table'),'collection allowlist rejects arbitrary identifiers');

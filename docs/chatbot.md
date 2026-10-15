@@ -12,6 +12,8 @@
 
 검증: `npm run test:chat` 및 `npm run test:integration`. 로컬 실제 PostgreSQL 엔진의 별도 가상 Auth 세션으로 권한·마스킹·계산·인젝션·페이지네이션과 브라우저 흐름을 검증합니다. 운영 DB에 테스트 자료를 만들지 않습니다.
 
+운영 검증(2026-10-15): 기존 관리자 로그인에서 활동 계정 1건 및 운영 구역 10건을 실제 조회하고 권한 밖 납부 조회의 안내를 확인했습니다. 회원 0건 상태를 유지했습니다. Supabase 보안 점검에서 신규 DB 경고는 없고, 기존 Auth의 유출 비밀번호 보호 비활성 경고가 남아 있습니다. 관련 계정 보안 설정은 이번 기능에서 변경하지 않았습니다. [유출 비밀번호 보호 설정 안내](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+
 ## 로봇 이미지 제작
 
 - 도구: 내장 imagegen (CLI 사용 안 함)

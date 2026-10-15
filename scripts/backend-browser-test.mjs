@@ -123,10 +123,12 @@ try{
  check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'320px page has no overflow while chat open');
  await page.locator('.chat-filters summary').click();
  check(await page.locator('.chat-filter-grid').evaluate(d=>d.scrollWidth<=d.clientWidth),'mobile filter inputs fit grid');
- await page.screenshot({path:'output/qa/chat-mobile.png',fullPage:true});
+ check(await page.locator('.chat-filter-grid').evaluate(d=>{const [a,b]=d.querySelectorAll('select,input');return Math.abs(a.getBoundingClientRect().top-b.getBoundingClientRect().top)<2}),'filter controls have aligned baselines');
+ await page.locator('.chat-filters summary').click();await page.locator('.chat-scroll').evaluate(d=>d.scrollTop=d.scrollHeight);
+ await page.screenshot({path:'output/qa/chat-mobile.png'});
  await page.keyboard.press('Escape');check(!await page.locator('#chat-dialog').isVisible(),'Escape closes chatbot');
  check(await page.locator('.chat-launcher').evaluate(b=>b===document.activeElement),'closing returns keyboard focus to launcher');
- await page.setViewportSize({width:1440,height:1080});await page.locator('.chat-launcher').click();await page.screenshot({path:'output/qa/chat-desktop.png',fullPage:true});
+ await page.setViewportSize({width:1440,height:1080});await page.locator('.chat-launcher').click();await page.locator('.chat-scroll').evaluate(d=>d.scrollTop=d.scrollHeight);await page.screenshot({path:'output/qa/chat-desktop.png'});
  await page.getByRole('button',{name:'챗봇 닫기'}).click();await page.locator('.chat-launcher').click();check(await page.locator('.chat-result').count()===3,'conversation retained when reopened in same session');
  await page.getByRole('button',{name:'챗봇 닫기'}).click();
  const chatAdmin=await login('admin');await chatAdmin.page.locator('.chat-launcher').click();

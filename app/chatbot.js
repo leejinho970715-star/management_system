@@ -18,11 +18,11 @@ export function createChatbot({remote,allowed,isAuthenticated}){
    <nav class="chat-categories" aria-label="챗봇 조회 항목">${available.map(c=>`<button type="button" data-chat-category="${c.id}" aria-pressed="${c.id===category}">${c.label}</button>`).join('')}</nav>
    <details class="chat-filters"><summary>조회 범위와 기간</summary><div class="chat-filter-grid">
     <label>구역<select name="chat-district">${own?`<option>${esc(own)}</option>`:'<option value="">허용된 전체 범위</option>'+Array.from({length:10},(_,i)=>`<option>${i+1}구역</option>`).join('')}</select></label>
-    <label>연월 <span>(납부·심방)</span><input name="chat-month" type="month" min="2020-01" max="2100-12" value="${remote.today.slice(0,7)}" required></label>
-    <label>연도 <span>(출결·보고)</span><input name="chat-year" type="number" min="2020" max="2100" value="${remote.year}" required></label>
-    <label>주차 <span>(출결·보고)</span><input name="chat-week" type="number" min="1" max="54" value="${remote.currentWeek}" required></label>
-    <label>예배 <span>(출결)</span><select name="chat-service">${(remote.baseline?.settings?.services||['주일','수요','금요']).map(s=>`<option>${esc(s)}</option>`).join('')}</select></label>
-   </div><p>질문에 구역·연월·주차를 쓰면 선택값보다 우선 적용됩니다.</p></details>
+    <label>연월<input name="chat-month" type="month" min="2020-01" max="2100-12" value="${remote.today.slice(0,7)}" required></label>
+    <label>연도<input name="chat-year" type="number" min="2020" max="2100" value="${remote.year}" required></label>
+    <label>주차<input name="chat-week" type="number" min="1" max="54" value="${remote.currentWeek}" required></label>
+    <label>예배 유형<select name="chat-service">${(remote.baseline?.settings?.services||['주일','수요','금요']).map(s=>`<option>${esc(s)}</option>`).join('')}</select></label>
+   </div><p>납부·심방은 연월, 출결·보고는 연도·주차를 사용합니다. 질문에 쓴 조건이 선택값보다 우선 적용됩니다.</p></details>
    <p class="chat-example">예: <button type="button" class="chat-example-button">${esc(available.find(c=>c.id===category)?.example||'구역 현황')}</button><br>이름·이메일·과정명도 검색할 수 있어요.</p>
    <div class="chat-messages" role="log" aria-label="조회 대화" aria-live="polite" aria-relevant="additions"></div>
    </div><form class="chat-form"><label class="sr-only" for="chat-question">조회할 질문</label><div class="chat-input-row"><input id="chat-question" name="question" maxlength="200" autocomplete="off" placeholder="질문이나 검색어를 입력하세요"><button type="submit" aria-label="질문 보내기">↑</button></div><p>현재 DB 기준 · 개인정보 마스킹 · 대화는 이 화면에서만 유지</p><div class="chat-status" role="status"></div></form>
