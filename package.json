@@ -9,7 +9,8 @@
     "build": "node scripts/build-static.mjs",
     "test:backend": "node scripts/backend-test.mjs",
     "test:integration": "node scripts/backend-browser-test.mjs",
-    "test:accounts": "node scripts/account-registration-test.mjs"
+    "test:accounts": "node scripts/account-registration-test.mjs",
+    "test:chat": "node scripts/chat-test.mjs"
   },
   "description": "Faith management screens with Supabase Auth and PostgreSQL backend",
   "dependencies": {

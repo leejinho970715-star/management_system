@@ -108,6 +108,34 @@ try{
  check(await scalar("select data->>'role' value from private.accounts where data->>'email'='created-educator@qa.invalid'")==='educator','administrator form creates an Auth-linked account without email');
  check(await creator.page.locator('#generic-form [name=password]').inputValue()==='','successful registration clears password fields');
  const direct=await login('created-educator','Direct-account-123!');check(await direct.page.locator('.profile-role').innerText()==='교육 사명자','directly registered account signs in with its database role');await direct.ctx.close();await creator.ctx.close();
+ // Chat uses the real SQL RPC over the test transport, with the same signed-in roles.
+ await page.setViewportSize({width:1440,height:1080});await page.goto(appOrigin+'/#CM-02');await page.locator('.chat-launcher').waitFor();
+ await page.getByRole('button',{name:'도림 도우미'}).click();await page.getByRole('dialog',{name:'도림 도우미'}).waitFor();
+ check(await page.locator('.chat-head img').evaluate(img=>img.complete&&img.naturalWidth>0),'3D robot asset loads');
+ await page.getByLabel('조회할 질문').fill('1구역 회원 현황');await page.getByRole('button',{name:'질문 보내기'}).click();await page.locator('.chat-result').waitFor();
+ check((await page.locator('.chat-result').last().innerText()).includes('1건을 찾았어요'),'typed chat query retrieves persisted member');
+ check(!(await page.locator('.chat-messages').innerText()).includes('통합테스트'),'chat response keeps member names masked');
+ await page.getByLabel('조회할 질문').fill('이번 주 출석률');await page.getByRole('button',{name:'질문 보내기'}).click();await page.locator('.chat-result').filter({hasText:'출석률'}).waitFor();
+ check((await page.locator('.chat-result').last().innerText()).includes('100%'),'chat displays database-calculated attendance rate');
+ await page.locator('[data-chat-category=finance]').click();await page.locator('.chat-result').filter({hasText:'25,000원'}).waitFor();check(true,'category button queries actual finance total');
+ await page.setViewportSize({width:320,height:844});
+ check(await page.locator('#chat-dialog').evaluate(d=>d.scrollWidth<=d.clientWidth),'320px chatbot has no dialog overflow');
+ check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'320px page has no overflow while chat open');
+ await page.locator('.chat-filters summary').click();
+ check(await page.locator('.chat-filter-grid').evaluate(d=>d.scrollWidth<=d.clientWidth),'mobile filter inputs fit grid');
+ await page.screenshot({path:'output/qa/chat-mobile.png',fullPage:true});
+ await page.keyboard.press('Escape');check(!await page.locator('#chat-dialog').isVisible(),'Escape closes chatbot');
+ check(await page.locator('.chat-launcher').evaluate(b=>b===document.activeElement),'closing returns keyboard focus to launcher');
+ await page.setViewportSize({width:1440,height:1080});await page.locator('.chat-launcher').click();await page.screenshot({path:'output/qa/chat-desktop.png',fullPage:true});
+ await page.getByRole('button',{name:'챗봇 닫기'}).click();await page.locator('.chat-launcher').click();check(await page.locator('.chat-result').count()===3,'conversation retained when reopened in same session');
+ await page.getByRole('button',{name:'챗봇 닫기'}).click();
+ const chatAdmin=await login('admin');await chatAdmin.page.locator('.chat-launcher').click();
+ check(await chatAdmin.page.locator('[data-chat-category=finance]').count()===0,'administrator has no finance chip');
+ await chatAdmin.page.getByLabel('조회할 질문').fill('이번 달 납부 합계');await chatAdmin.page.getByRole('button',{name:'질문 보내기'}).click();await chatAdmin.page.getByText('현재 역할에서 조회할 수 없는 항목입니다.',{exact:false}).waitFor();
+ check(await chatAdmin.page.locator('.chat-result').count()===0,'forbidden typed intent has no result');
+ await chatAdmin.page.locator('[data-chat-category=organization]').click();await chatAdmin.page.locator('.chat-result').filter({hasText:'10건을 찾았어요'}).waitFor();check(true,'admin organization chip queries 10 districts');
+ await chatAdmin.page.getByRole('button',{name:'챗봇 닫기'}).click();await chatAdmin.page.locator('[data-action=logout]').first().click();await chatAdmin.page.locator('#production-login-form').waitFor();
+ check(!await chatAdmin.page.locator('.chat-launcher').count()&&await chatAdmin.page.locator('.chat-messages').count()===0,'logout clears chat DOM and records');await chatAdmin.ctx.close();
  const allScreens=new Set();
  for(const role of ['lead','district','finance','admin','visitor','evangelist','educator','tf']){
   const session=await login(role);

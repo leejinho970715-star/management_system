@@ -94,6 +94,7 @@ export const remote={
  async streaks(week,service){return rpc('app_absence_streaks',{p_year:this.year,p_week:week,p_service:service})},
  async registerAbsences(week,service){return this.accept(await rpc('app_register_absences',{p_year:this.year,p_week:week,p_service:service}))},
  async searchMembers(query){return rpc('app_search_members',{p_query:query})},
+ async chatSearch(q){return rpc('app_chat_search',{p_category:q.category,p_term:q.term||'',p_district:q.district||null,p_month:q.month,p_year:q.year,p_week:q.week,p_service:q.service,p_status:q.status||'',p_offset:q.offset||0})},
  async mutation(collection,id,version,action,data,reason,week,service){return this.accept(await rpc('app_commit',{changes:[{collection,id,version,action,data,reason}],p_year:this.year,p_week:week,p_service:service}))},
  async trash(collection){return rpc('app_deleted_records',{c:collection})},
  async log(action,collection,ids,reason=''){return rpc('app_log_access',{p_action:action,p_collection:collection,p_ids:ids,p_reason:reason})},
