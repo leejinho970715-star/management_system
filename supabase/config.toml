@@ -15,4 +15,6 @@ enable_anonymous_sign_ins = false
 minimum_password_length = 12
 
 [functions.manage-accounts]
-verify_jwt = true
+# Custom authentication verifies every user through Auth.getUser plus DB authority.
+# Legacy gateway JWT verification does not support asymmetric signing keys.
+verify_jwt = false

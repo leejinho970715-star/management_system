@@ -1,3 +1,5 @@
+// verify_jwt=false: Auth.getUser and app_authority below are the authentication boundary.
+// This supports current asymmetric signing keys and validates the active DB session.
 import {createClient} from 'npm:@supabase/supabase-js@2.117.3';
 
 const allowedOrigins=new Set([
