@@ -4,7 +4,7 @@
 
 사용자의 추가 요청에 따라 주 색상 `#0D9488`, Pretendard, 그림자·입체 효과 없는 평면 스타일, `1구역`~`10구역`을 반영했습니다. 시안 모드의 개인정보와 업무 기록은 모두 가상 데이터입니다.
 
-2026-10-15에 Supabase Auth·PostgreSQL·SQL RPC·계정 초대 서버 함수와 운영 모드를 추가했습니다. 서울의 새 `management-system` 프로젝트에 마이그레이션과 서버 함수를 적용했으며, 기본 연결 설정은 실제 Supabase 모드입니다. 최초 관리자 인증 사용자 생성·업무 계정 연결 후 로그인할 수 있습니다. [백엔드 구축 가이드](docs/백엔드_구축_가이드.md), [조회 쿼리 모음](supabase/queries.sql), `supabase/migrations/`를 참고하세요.
+2026-10-15에 Supabase Auth·PostgreSQL·SQL RPC·계정 초대 서버 함수와 운영 모드를 추가했습니다. 서울의 새 `management-system` 프로젝트에 마이그레이션과 서버 함수를 적용했으며, 기본 연결 설정은 실제 Supabase 모드입니다. 최초 관리자 연결과 실제 운영 사이트의 로그인·직책 등록·수정·재조회·삭제·복원·감사 이력을 검증했습니다. [백엔드 구축 가이드](docs/백엔드_구축_가이드.md), [조회 쿼리 모음](supabase/queries.sql), `supabase/migrations/`를 참고하세요.
 
 ## 실행
 
