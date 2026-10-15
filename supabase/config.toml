@@ -14,6 +14,10 @@ enable_signup = false
 enable_anonymous_sign_ins = false
 minimum_password_length = 12
 
+[auth.email.template.invite]
+subject = "[일심도림] 신앙관리 계정 초대"
+content_path = "./supabase/templates/invite.html"
+
 [functions.manage-accounts]
 # Custom authentication verifies every user through Auth.getUser plus DB authority.
 # Legacy gateway JWT verification does not support asymmetric signing keys.
