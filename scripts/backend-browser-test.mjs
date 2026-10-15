@@ -7,9 +7,11 @@ import {spawn} from 'node:child_process';
 import {createRequire} from 'node:module';
 import {testDatabase} from '../backend/local-test-db.mjs';
 import {screens} from '../app/catalog.js';
+import {createAccountHandler} from '../supabase/functions/manage-accounts/handler.js';
 const require=createRequire(import.meta.url);
 const {chromium}=require('C:/Users/tlscj/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 const db=await testDatabase();const secret=randomBytes(32);const users=[];let checks=0;
+const testPasswords=new Map();let accountHandler;
 const check=(v,title)=>{if(!v)throw Error(title);checks++;if(!title.startsWith('production '))console.log('PASS '+title)};
 const q=(s,p=[])=>db.query(s,p);
 const scalar=async(s,p=[])=>(await q(s,p)).rows[0]?.value;
@@ -26,8 +28,9 @@ const transport=http.createServer(async(req,res)=>{
  if(req.method==='OPTIONS'){send(200,{});return}
  try{
   const url=new URL(req.url,'http://localhost');let raw='';for await(const chunk of req)raw+=chunk;const body=raw?JSON.parse(raw):{};
+  if(url.pathname==='/functions/v1/manage-accounts'){const result=await accountHandler(new Request(restOrigin+url.pathname,{method:req.method,headers:req.headers,body:raw}));send(result.status,await result.json());return}
   if(url.pathname==='/auth/v1/token'){
-   const u=users.find(u=>url.searchParams.get('grant_type')==='refresh_token'?body.refresh_token===u.refresh:body.email===u.email&&body.password==='Qa-password-123!');
+   const u=users.find(u=>url.searchParams.get('grant_type')==='refresh_token'?body.refresh_token===u.refresh:body.email===u.email&&body.password===(testPasswords.get(u.email)||'Qa-password-123!'));
    if(!u){send(400,{error:'invalid_grant',error_description:'Invalid credentials'});return}
    send(200,{access_token:jwt(u),token_type:'bearer',expires_in:3600,expires_at:Math.floor(Date.now()/1000)+3600,refresh_token:u.refresh,user:u});return;
   }
@@ -48,14 +51,22 @@ await new Promise(r=>transport.listen(0,'127.0.0.1',r));
 const restOrigin='http://127.0.0.1:'+transport.address().port;
 const reserve=http.createServer();await new Promise(r=>reserve.listen(0,'127.0.0.1',r));const appPort=reserve.address().port;await new Promise(r=>reserve.close(r));
 const appOrigin='http://127.0.0.1:'+appPort;
+accountHandler=createAccountHandler({env:n=>({SUPABASE_URL:restOrigin,SUPABASE_PUBLISHABLE_KEY:'public-qa',SUPABASE_SECRET_KEY:'server-qa',APP_ALLOWED_ORIGINS:appOrigin})[n],createClient:(url,key,options)=>{
+ if(key==='server-qa')return {auth:{admin:{
+  async createUser(input){const u={id:crypto.randomUUID(),session:crypto.randomUUID(),refresh:crypto.randomUUID(),email:input.email,aud:'authenticated',user_metadata:{},app_metadata:{provider:'email'},created_at:new Date().toISOString()};await q('insert into auth.users(id,email) values($1,$2)',[u.id,u.email]);await q('insert into auth.sessions(id,user_id) values($1,$2)',[u.session,u.id]);users.push(u);testPasswords.set(u.email,input.password);return {data:{user:u},error:null}},
+  async deleteUser(id){await q('delete from auth.sessions where user_id=$1',[id]);await q('delete from auth.users where id=$1',[id]);return {error:null}},
+ }},rpc:async(name,body)=>{try{const proc=procedures.get(name),types=proc.argtypes.split(', '),args=proc.proargnames.map((n,i)=>types[i]==='jsonb'?JSON.stringify(body[n]):body[n]);return {data:await db.transaction(async tx=>{await tx.exec('set local role service_role');return (await tx.query(`select public."${name}"(${args.map((_,i)=>'$'+(i+1)+'::'+types[i]).join(',')}) value`,args)).rows[0].value}),error:null}}catch(error){return {error}}}};
+ const claims=verify(options.global.headers.Authorization.replace(/^Bearer /,''));
+ return {auth:{getUser:async()=>({data:{user:claims&&users.find(u=>u.id===claims.sub)},error:claims?null:Error('Invalid token')})},rpc:async()=>{try{return {data:await db.transaction(async tx=>{await tx.query("select set_config('request.jwt.claims',$1,true)",[JSON.stringify(claims)]);await tx.exec('set local role authenticated');return (await tx.query('select public.app_authority() value')).rows[0].value}),error:null}}catch(error){return {error}}}};
+}});
 const child=spawn(process.execPath,['server.mjs',String(appPort)],{cwd:process.cwd(),windowsHide:true,stdio:['ignore','pipe','pipe'],env:{...process.env,APP_SUPABASE_URL:restOrigin,APP_SUPABASE_PUBLISHABLE_KEY:'sb_publishable_local_qa'}});
 let readyResolve;const ready=new Promise(r=>readyResolve=r);child.stdout.on('data',()=>readyResolve());child.stderr.on('data',d=>console.error(String(d).slice(0,500)));
 const browser=await chromium.launch({headless:true,executablePath:'C:/Users/tlscj/AppData/Local/ms-playwright/chromium-1234/chrome-win64/chrome.exe'});
 const errors=[];
-async function login(role){
+async function login(role,password='Qa-password-123!'){
  const ctx=await browser.newContext({viewport:{width:1440,height:1080}}),page=await ctx.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')console.error('BROWSER',m.text())});
  await page.goto(appOrigin+'/?role=admin#AD-02');await page.locator('#production-login-form').waitFor();
- await page.locator('[name=email]').fill(role+'@qa.invalid');await page.locator('[name=password]').fill('Qa-password-123!');await page.locator('#production-login-form button[type=submit]').click();await page.waitForFunction(()=>document.querySelector('.sidebar')||document.querySelector('#production-login-error:not([hidden])'));if(!await page.locator('.sidebar').count())throw Error(await page.locator('#production-login-error').innerText());
+ await page.locator('[name=email]').fill(role+'@qa.invalid');await page.locator('[name=password]').fill(password);await page.locator('#production-login-form button[type=submit]').click();await page.waitForFunction(()=>document.querySelector('.sidebar')||document.querySelector('#production-login-error:not([hidden])'));if(!await page.locator('.sidebar').count())throw Error(await page.locator('#production-login-error').innerText());
  return {ctx,page};
 }
 try{
@@ -89,6 +100,14 @@ try{
  await page.reload();await page.waitForFunction(()=>document.querySelector('.topbar .profile-avatar img')?.naturalWidth===256);check(true,'profile photo persists in database across reload');
  fs.mkdirSync('output/qa',{recursive:true});await page.screenshot({path:'output/qa/backend-mobile.png',fullPage:true});
  check(errors.length===0,'no production browser runtime errors');
+ const creator=await login('admin');await creator.page.goto(appOrigin+'/#SY-02');await creator.page.locator('#generic-form [name=password]').waitFor();
+ await creator.page.locator('#generic-form [name=email]').fill('created-educator@qa.invalid');await creator.page.locator('#generic-form [name=role]').selectOption('educator');
+ await creator.page.locator('#generic-form [name=password]').fill('Direct-account-123!');await creator.page.locator('#generic-form [name=confirmPassword]').fill('Different-password-123!');await creator.page.getByRole('button',{name:'계정 등록',exact:true}).click();
+ await creator.page.waitForFunction(()=>document.querySelector('#toast').textContent.includes('일치하지'));check(!users.some(u=>u.email==='created-educator@qa.invalid'),'password confirmation blocks invalid registration');
+ await creator.page.locator('#generic-form [name=confirmPassword]').fill('Direct-account-123!');await creator.page.getByRole('button',{name:'계정 등록',exact:true}).click();await creator.page.getByRole('cell',{name:'created-educator@qa.invalid',exact:true}).waitFor();
+ check(await scalar("select data->>'role' value from private.accounts where data->>'email'='created-educator@qa.invalid'")==='educator','administrator form creates an Auth-linked account without email');
+ check(await creator.page.locator('#generic-form [name=password]').inputValue()==='','successful registration clears password fields');
+ const direct=await login('created-educator','Direct-account-123!');check(await direct.page.locator('.profile-role').innerText()==='교육 사명자','directly registered account signs in with its database role');await direct.ctx.close();await creator.ctx.close();
  const allScreens=new Set();
  for(const role of ['lead','district','finance','admin','visitor','evangelist','educator','tf']){
   const session=await login(role);

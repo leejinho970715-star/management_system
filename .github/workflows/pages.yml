@@ -32,6 +32,7 @@ jobs:
           npm ci
           npm test
           npm run test:backend
+          npm run test:accounts
       - name: Configure Pages
         id: pages
         uses: actions/configure-pages@v5

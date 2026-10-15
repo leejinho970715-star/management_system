@@ -99,7 +99,11 @@ export const remote={
  async log(action,collection,ids,reason=''){return rpc('app_log_access',{p_action:action,p_collection:collection,p_ids:ids,p_reason:reason})},
  async resetPassword(email){const redirectTo=new URL(location.pathname,location.origin).href+'#CM-01';const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo});if(error)throw error},
  async changePassword(password){const {error}=await client.auth.updateUser({password});if(error)throw error},
- async invite(data){const {data:result,error}=await client.functions.invoke('manage-accounts',{body:data});if(error)throw Error('계정 초대에 실패했습니다. 서버 함수 설정과 이메일을 확인하세요.');if(result?.error)throw Error(result.error);return this.refresh()},
+ async createAccount(data){
+  const {data:result,error}=await client.functions.invoke('manage-accounts',{body:{email:data.email,password:data.password,memberId:data.memberId||null,role:data.role,district:data.district,status:data.status,enforceAssignments:data.enforceAssignments}});
+  if(error){let detail;try{detail=await error.context?.json()}catch{}throw Error(typeof detail?.error==='string'?detail.error:'계정 등록 서버에 연결하지 못했습니다. 잠시 후 다시 시도하세요.')}
+  if(result?.error)throw Error(result.error);return this.refresh();
+ },
 };
 client?.auth.onAuthStateChange(event=>{if(event==='PASSWORD_RECOVERY')remote.recoveryPending=true});
 export {diff,normalized};

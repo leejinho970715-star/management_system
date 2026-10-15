@@ -4,7 +4,7 @@
 
 사용자의 추가 요청에 따라 주 색상 `#0D9488`, Pretendard, 그림자·입체 효과 없는 평면 스타일, `1구역`~`10구역`을 반영했습니다. 시안 모드의 개인정보와 업무 기록은 모두 가상 데이터입니다.
 
-2026-10-15에 Supabase Auth·PostgreSQL·SQL RPC·계정 초대 서버 함수와 운영 모드를 추가했습니다. 서울의 새 `management-system` 프로젝트에 마이그레이션과 서버 함수를 적용했으며, 기본 연결 설정은 실제 Supabase 모드입니다. 최초 관리자 연결과 실제 운영 사이트의 로그인·직책 등록·수정·재조회·삭제·복원·감사 이력을 검증했습니다. [백엔드 구축 가이드](docs/백엔드_구축_가이드.md), [조회 쿼리 모음](supabase/queries.sql), `supabase/migrations/`를 참고하세요.
+2026-10-15에 Supabase Auth·PostgreSQL·SQL RPC·계정 등록 서버 함수와 운영 모드를 추가했습니다. 관리자는 **계정 관리**에서 이메일과 초기 비밀번호로 계정을 직접 등록하며, 등록된 사용자는 메일 수락 없이 로그인합니다. 운영 DB의 테스트 업무 기록을 정리해 관리자 계정과 1~10구역·지역·운영 설정으로 시작합니다. [백엔드 구축 가이드](docs/백엔드_구축_가이드.md), [조회 쿼리 모음](supabase/queries.sql), `supabase/migrations/`를 참고하세요.
 
 ## 실행
 
@@ -65,7 +65,7 @@ node server.mjs
 | `app/remote.js` | 실제 Supabase 인증·행 단위 저장·조회·집계 연결 |
 | `app/entities.js` | DB 및 기록 관리 폼의 필드·관계·검증 계약 |
 | `supabase/migrations/` | 테이블·외래 키·인덱스·RLS·SQL API |
-| `supabase/functions/manage-accounts/` | 권한 확인 후 계정 초대와 Auth 연결 |
+| `supabase/functions/manage-accounts/` | 권한 확인 후 초기 비밀번호로 신규 Auth 계정 생성·업무 연결 |
 | `server.mjs` | 127.0.0.1에서 제공하는 정적 서버 |
 
 ## 검증과 문서 재생성
