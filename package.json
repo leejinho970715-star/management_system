@@ -2,7 +2,21 @@
   "name": "sindorim-faith-management-prototype",
   "private": true,
   "type": "module",
-  "version": "1.0.0",
-  "scripts": {"start": "node server.mjs", "test": "node scripts/domain-test.mjs", "build": "node scripts/build-static.mjs"},
-  "description": "47-screen local prototype based on the 2026-10-09 planning document"
+  "version": "1.1.0",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node scripts/domain-test.mjs",
+    "build": "node scripts/build-static.mjs",
+    "test:backend": "node scripts/backend-test.mjs",
+    "test:integration": "node scripts/backend-browser-test.mjs"
+  },
+  "description": "Faith management screens with Supabase Auth and PostgreSQL backend",
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.3"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.10",
+    "esbuild": "0.28.2",
+    "supabase": "2.121.0"
+  }
 }

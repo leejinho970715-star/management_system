@@ -4,3 +4,8 @@ node_modules/
 *.log
 dist/
 output/*.zip
+.env
+.env.*
+!.env.example
+supabase/.temp/
+supabase/.branches/

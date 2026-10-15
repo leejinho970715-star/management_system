@@ -1,7 +1,7 @@
 import {maskName} from './domain.js';
 export const KEY='sindorim-prototype-v2';
 export const DISTRICTS=Array.from({length:10},(_,i)=>(i+1)+'구역');
-export const TODAY='2026-10-10';
+export const TODAY=globalThis.APP_CONFIG?.mode==='supabase'?new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()):'2026-10-10';
 const names=['김하늘','이서준','박민지','최지훈','정수연','강도윤','조은서','윤현우','장서연','임지호','한예린','오민준','서지안','신윤서','권시우','황채원','안준호','송다은'];
 export function seed(){
  const members=Array.from({length:60},(_,i)=>{const name=names[i%names.length];return ({id:'m'+(i+1),name,phone:'010-0000-'+(4100+i),district:DISTRICTS[Math.floor(i/6)],status:i===3||i===10?'장기결석':'활동',birthday:'1991-01-01',address:'가상 주소',consent:true,consentAt:'2026-09-01',createdAt:'2026-09-01',createdBy:'가상 관리자'})});
@@ -15,4 +15,4 @@ export function seed(){
 }
 export function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s?.version===2){if(!s.accounts.some(a=>a.role==='admin'))s.accounts.push({id:'u3',email:'admin@example.test',memberId:'m13',role:'admin',district:'지역',status:'활동'});return s}}catch{}return seed()}
 export function save(state){localStorage.setItem(KEY,JSON.stringify(state))}
-export function label(state,id){const m=state.members.find(x=>x.id===id)||state.prospects.find(x=>x.id===id);return m?maskName(m.name,m.phone):'미지정'}
+export function label(state,id){const m=state.members.find(x=>x.id===id)||state.prospects.find(x=>x.id===id)||state.archivedMembers?.find(x=>x.id===id);return m?maskName(m.name,m.phone):'미지정'}

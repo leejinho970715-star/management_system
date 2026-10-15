@@ -28,7 +28,10 @@ jobs:
         with:
           node-version: '24'
       - name: Check domain rules
-        run: npm test
+        run: |
+          npm ci
+          npm test
+          npm run test:backend
       - name: Configure Pages
         id: pages
         uses: actions/configure-pages@v5

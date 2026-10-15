@@ -1,0 +1,18 @@
+project_id = "management-system"
+
+[api]
+enabled = true
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[auth]
+enabled = true
+site_url = "https://management-system-six-omega.vercel.app"
+additional_redirect_urls = ["https://management-system-six-omega.vercel.app/**", "https://leejinho970715-star.github.io/management_system/**", "http://127.0.0.1:4174/**"]
+enable_signup = false
+enable_anonymous_sign_ins = false
+minimum_password_length = 12
+
+[functions.manage-accounts]
+verify_jwt = true
